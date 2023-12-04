@@ -49,7 +49,7 @@ done
 
 # If no dir provided, use the current directory
 if [ -z "$drupalDir" ]; then
-    drupaldir=$(pwd)
+    drupalDir=$(pwd)
 fi
 
 drush=$(findDrush "$drupalDir")
@@ -61,7 +61,7 @@ fi
 drushCmd=("$drush" "${args[@]}")
 
 # Pass the current environment variables to the drush command
-export "${!BASH_ENV[@]}"
+export "${!BASH_ENV[@]}" >/dev/null
 
 # Run the drush command
 "${drushCmd[@]}"
