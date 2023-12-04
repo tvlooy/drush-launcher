@@ -1,0 +1,68 @@
+#!/bin/bash
+
+findDrush() {
+    local path="$1"
+
+    # Check if the vendor/bin/drush directory exists in the current directory
+    drushDir="$path/vendor/bin/drush"
+    if [ -e "$drushDir" ]; then
+        # Drush found, return the current directory
+        echo "$drushDir"
+        return
+    fi
+
+    # Move one level up the directory tree
+    parentDir=$(dirname "$path")
+    if [ "$parentDir" == "$path" ]; then
+        # If we reached the root directory, stop traversing
+        return
+    fi
+
+    # Check if the vendor/bin/drush directory exists in the parent directory
+    drushDir="$parentDir/vendor/bin/drush"
+    if [ -e "$drushDir" ]; then
+        # Drush found in the parent directory, return the parent directory
+        echo "$drushDir"
+        return
+    fi
+
+    # Recursively continue searching in the parent directory
+    findDrush "$parentDir"
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -r=*|--root=*)
+            drupalDir="${1#*=}"
+            shift 1
+            ;;
+        -r|--root)
+            drupalDir="$2"
+            shift 2
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# If no dir provided, use the current directory
+if [ -z "$drupalDir" ]; then
+    drupaldir=$(pwd)
+fi
+
+drush=$(findDrush "$drupalDir")
+if [ -z "$drush" ]; then
+    echo "Drush not found in $drupalDir."
+    exit 1
+fi
+
+drushCmd=("$drush" "${args[@]}")
+
+# Pass the current environment variables to the drush command
+export "${!BASH_ENV[@]}"
+
+# Run the drush command
+"${drushCmd[@]}"
+
