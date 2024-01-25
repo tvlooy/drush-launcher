@@ -30,6 +30,7 @@ findDrush() {
     findDrush "$parentDir"
 }
 
+args="$@"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -r=*|--root=*)
@@ -41,7 +42,6 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            args+=("$1")
             shift
             ;;
     esac
@@ -58,7 +58,7 @@ if [ -z "$drush" ]; then
     exit 1
 fi
 
-drushCmd=("$drush" "${args[@]}")
+drushCmd=("$drush" "$args")
 
 # Pass the current environment variables to the drush command
 export "${!BASH_ENV[@]}" >/dev/null
