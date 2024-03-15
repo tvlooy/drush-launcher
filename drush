@@ -63,6 +63,11 @@ drushCmd=("$drush" "${args[@]}")
 # Pass the current environment variables to the drush command
 export "${!BASH_ENV[@]}" >/dev/null
 
+if [ "$DRUSH_ALLOW_XDEBUG" != 1 ]
+then
+  # @see https://xdebug.org/docs/all_settings#mode
+  export XDEBUG_MODE=off
+fi
+
 # Run the drush command
 "${drushCmd[@]}"
-
